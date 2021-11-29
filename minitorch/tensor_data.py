@@ -45,9 +45,9 @@ def to_index(ordinal, shape, out_index):
 
     """
     # TODO: Implement for Task 2.1.
-    for d in range(len(shape) - 1, -1, -1):
-        out_index[d] = ordinal % shape[d]
-        ordinal = ordinal // shape[d]
+    for i in range(len(shape) - 1, -1, -1):
+        out_index[i] = ordinal % shape[i]
+        ordinal = ordinal // shape[i]
 
 
 def broadcast_index(big_index, big_shape, shape, out_index):
@@ -68,8 +68,8 @@ def broadcast_index(big_index, big_shape, shape, out_index):
         None : Fills in `out_index`.
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
-
+    for i in range(len(shape)):
+        out_index.append(big_index[len(big_shape) - len(shape) + i] % shape[i])
 
 def shape_broadcast(shape1, shape2):
     """
@@ -86,7 +86,22 @@ def shape_broadcast(shape1, shape2):
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    shape = []
+    if len(shape1) != len(shape2):
+        shape_padded_1 = abs(len(shape1) - len(shape2)) * (1,) + (shape1 if len(shape1) < len(shape2) else shape2)
+        shape_padded_2 = shape1 if len(shape1) > len(shape2) else shape2
+    else:
+        shape_padded_1 = shape1
+        shape_padded_2 = shape2
+    for i in range(len(shape_padded_1)):
+        if shape_padded_1[i] >= shape_padded_2[i] and shape_padded_1[i] % shape_padded_2[i] == 0:
+            shape.append(shape_padded_1[i])
+        elif (shape_padded_2[i] > shape_padded_1[i] and shape_padded_2[i] % shape_padded_1[i] == 0):
+            shape.append(shape_padded_2[i])
+        else:
+            raise IndexingError('shape is not matches')
+
+    return tuple(shape)
 
 
 def strides_from_shape(shape):
